@@ -53,9 +53,19 @@ public class Point implements WritableComparable{
      */
     public Point(String str)
     {
-    	
-        System.out.println("TODO");
-        System.exit(1);
+    	if(str == null || str.length() == 0){
+    		System.out.println("input string is empty");
+    	}else{
+    		String[] tempStore = str.split("\\s+");
+    		this.dimension = tempStore.length;
+    		
+    		for(int i = 0; i < this.dimension; i++){
+    			this.pointCoord.put(i, Float.parseFloat(tempStore[i]));
+    		}
+    	}
+        
+    	//System.out.println("TODO");
+        //System.exit(1);
     }
 
     /**
@@ -63,8 +73,13 @@ public class Point implements WritableComparable{
      */
     public Point(Point other)
     {
-        System.out.println("TODO");
-        System.exit(1);
+    	this.dimension = other.dimension;
+    	
+    	for(int i = 0; i < this.dimension; i++){
+    		this.pointCoord.put(i, other.pointCoord.get(i));
+    	}
+        //System.out.println("TODO");
+        //System.exit(1);
     }
 
     /**
@@ -73,9 +88,10 @@ public class Point implements WritableComparable{
      */
     public int getDimension()
     {
-        System.out.println("TODO");
-        System.exit(1);
-        return 0;
+    	return this.dimension;
+        //System.out.println("TODO");
+        //System.exit(1);
+        //return 0;
     }
 
     /**
@@ -87,10 +103,27 @@ public class Point implements WritableComparable{
      */
     public String toString()
     {
-    	
-        System.out.println("TODO");
-        System.exit(1);
-        return null;
+    	if(this.pointCoord == null || this.pointCoord.keySet().size() == 0 || this.dimension == 0){
+    		System.out.println("point is empty");
+    		return null;
+    	}else{
+    		StringBuilder sb = new StringBuilder();
+    		
+    		for(int i = 0; i < this.dimension; i++){
+    			if(i == this.dimension - 1){
+    				sb.append(this.pointCoord.get(i).toString());
+    			}else{
+    				sb.append(this.pointCoord.get(i).toString() + " ");	
+    			}
+    		}
+    		
+    		String res = sb.toString();
+    		
+    		return res;	
+    	}
+        //System.out.println("TODO");
+        //System.exit(1);
+        //return null;
     }
 
     /**
@@ -102,9 +135,24 @@ public class Point implements WritableComparable{
     @Override
     public int compareTo(Object o)
     {   
-        System.out.println("TODO");
-        System.exit(1);
-        return 0;
+    	Point p = (Point)o;
+    	if(this.dimension != p.dimension){
+    		System.out.println("two points have different dimensions, undefined behavior");
+    		return 0;
+    	}else{
+    		for(int i = 0; i < this.dimension; i++){
+    			if(this.pointCoord.get(i) == p.pointCoord.get(i)){
+    				continue;
+    			}else{
+    				return this.pointCoord.get(i) < p.pointCoord.get(i) ? -1:1;
+    			}
+    		}
+    		
+    		return 0;
+    	}
+        //System.out.println("TODO");
+        //System.exit(1);
+        //return 0;
     }
 
     /**
@@ -112,9 +160,26 @@ public class Point implements WritableComparable{
      */
     public static final float distance(Point x, Point y)
     {
-        System.out.println("TODO");
-        System.exit(1);
-        return (float)0.0;
+    	int dim1 = x.dimension;
+    	int dim2 = y.dimension;
+    	
+    	if(dim1 != dim2){
+    		System.out.println("points in different dimension, can not calculate distance");
+    		return (float)0.0;
+    	}else{
+    		float sum = (float)0.0;
+    		
+    		for(int i = 0; i < dim1; i++){
+    			sum += Math.pow(x.pointCoord.get(i) - y.pointCoord.get(i), 2.0);
+    		}
+    		
+    		float res = (float)Math.sqrt(sum);
+    		
+    		return res;
+    	}
+        //System.out.println("TODO");
+        //System.exit(1);
+        //return (float)0.0;
     }
 
     /**
@@ -122,9 +187,22 @@ public class Point implements WritableComparable{
      */
     public static final Point addPoints(Point x, Point y)
     {
-        System.out.println("TODO");
-        System.exit(1);
-        return null;
+        if(x.dimension != y.dimension){
+        	System.out.println("points have different dimensions, can not be added directly");
+        	return null;
+        }else{
+        	Point res = new Point(x.dimension);
+        	
+        	for(int i = 0; i < x.dimension; i++){
+        		res.pointCoord.put(i, x.pointCoord.get(i) + y.pointCoord.get(i));
+        	}
+        	
+        	return res;
+        }
+    	
+    	//System.out.println("TODO");
+        //System.exit(1);
+        //return null;
     }
 
     /**
@@ -134,20 +212,51 @@ public class Point implements WritableComparable{
     //Point x = sum of all points associate with a particular centroid
     public static final Point multiplyScalar(Point x, float c)
     {
-        System.out.println("TODO");
-        System.exit(1);
-        return null;
+    	int dim = x.dimension;
+    	Point res = new Point(dim);
+    	
+    	for(int i = 0; i < dim; i++){
+    		res.pointCoord.put(i, x.pointCoord.get(i) * c);
+    	}
+    	
+    	return res;
+        //System.out.println("TODO");
+        //System.exit(1);
+        //return null;
     }
 
+    //deserialize the fields of in object
 	@Override
 	public void readFields(DataInput arg0) throws IOException {
 		// TODO Auto-generated method stub
+		String inputString = arg0.readLine();
 		
+		if(inputString == null || inputString.length() == 0){
+    		System.out.println("input string is empty");
+    	}else{
+    		String[] tempStore = inputString.split("\\s+");
+    		this.dimension = tempStore.length;
+    		
+    		for(int i = 0; i < this.dimension; i++){
+    			this.pointCoord.put(i, Float.parseFloat(tempStore[i]));
+    		}
+    	}
 	}
-
+	
+	//serialize the field of output arg0
 	@Override
 	public void write(DataOutput arg0) throws IOException {
 		// TODO Auto-generated method stub
+		for(int i = 0; i < this.dimension; i++){
+			if(i == this.dimension - 1){
+				arg0.writeFloat(this.pointCoord.get(i));
+				arg0.writeChars("\n");
+			}else{
+				arg0.writeFloat(this.pointCoord.get(i));
+				//TODO: why cannot use \s
+				arg0.writeChars("\t");
+			}
+		}
 		
 	}
 

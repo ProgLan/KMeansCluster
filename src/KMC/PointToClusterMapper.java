@@ -17,23 +17,23 @@ public class PointToClusterMapper extends Mapper<LongWritable, Text, Point, Poin
 {
 	
 	
-	public void map(LongWritable key, Text value, Context context)
-            throws IOException, InterruptedException
-        {
-			//TODO
-			StringTokenizer itr = new StringTokenizer(value.toString());
-			while(itr.hasMoreTokens()){
-				
-				
-			}
-			
-			//TODO for each points, find the closest centroid
-			
-            Point p = new Point(key.toString());    
-            assertTrue(p.getDimension() == dimension, "Invalid Dimension");
-            // Map all the points to the same key, so reducer can find centroids
-            //TODO, mapper's output key and value
-            context.write(KMeans.one, p);
-        }
+//	public void map(LongWritable key, Text value, Context context)
+//            throws IOException, InterruptedException
+//        {
+//			//TODO
+//			StringTokenizer itr = new StringTokenizer(value.toString());
+//			while(itr.hasMoreTokens()){
+//				
+//				
+//			}
+//			
+//			//TODO for each points, find the closest centroid
+//			
+//            Point p = new Point(key.toString());    
+//            assertTrue(p.getDimension() == dimension, "Invalid Dimension");
+//            // Map all the points to the same key, so reducer can find centroids
+//            //TODO, mapper's output key and value
+//            context.write(KMeans.one, p);
+//        }
 
 }

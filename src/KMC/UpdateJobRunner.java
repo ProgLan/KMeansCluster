@@ -30,26 +30,26 @@ public class UpdateJobRunner
      * @param The output directory for which to write job results, specified by user.
      * @precondition The global centroids variable has been set.
      */
-    public static Job createUpdateJob(int jobId, String inputDirectory, String outputDirectory)
-        throws IOException
-    {
-    	Job init_job = new Job(new Configuration(), "kmeans_init");
-        init_job.setJarByClass(KMeans.class);
-        init_job.setMapperClass(FileMapper.class);
-        init_job.setMapOutputKeyClass(IntWritable.class);
-        init_job.setMapOutputValueClass(Point.class);
-        init_job.setReducerClass(FileReducer.class);
-        init_job.setOutputKeyClass(IntWritable.class);
-        init_job.setOutputValueClass(Point.class);
-        FileInputFormat.addInputPath(init_job, new Path(inputDirectory));
-        FileOutputFormat.setOutputPath(init_job, new Path(outputDirectory));
-        init_job.setInputFormatClass(KeyValueTextInputFormat.class);
-        return init_job;
-    	
-    	System.out.println("TODO");
-        System.exit(1);
-        return null;
-    }
+//    public static Job createUpdateJob(int jobId, String inputDirectory, String outputDirectory)
+//        throws IOException
+//    {
+////    	Job init_job = new Job(new Configuration(), "kmeans_init");
+////        init_job.setJarByClass(KMeans.class);
+////        init_job.setMapperClass(FileMapper.class);
+////        init_job.setMapOutputKeyClass(IntWritable.class);
+////        init_job.setMapOutputValueClass(Point.class);
+////        init_job.setReducerClass(FileReducer.class);
+////        init_job.setOutputKeyClass(IntWritable.class);
+////        init_job.setOutputValueClass(Point.class);
+////        FileInputFormat.addInputPath(init_job, new Path(inputDirectory));
+////        FileOutputFormat.setOutputPath(init_job, new Path(outputDirectory));
+////        init_job.setInputFormatClass(KeyValueTextInputFormat.class);
+////        return init_job;
+////    	
+////    	System.out.println("TODO");
+////        System.exit(1);
+////        return null;
+//    }
 
     /**
      * Run the jobs until the centroids stop changing.

@@ -14,6 +14,7 @@ public class HelperTests
         // Tests
         assertEquals(6.0, Point.distance(p1, p2), 0.0001);
     }
+    
 
     @Test
     public void distance_test_2()
@@ -33,6 +34,16 @@ public class HelperTests
 
         // Tests
         assertEquals(4.0, Point.distance(p1, p2), 0.0001);
+    }
+    
+    @Test
+    public void distance_test_4()
+    {
+    	Point p1 = new Point("0 0 0 0");
+    	Point p2 = new Point("2.0 2.0 2.0 2.0");
+    	
+    	//tests
+    	assertEquals(4.0, Point.distance(p1, p2), 0.0001);
     }
 
     @Test
