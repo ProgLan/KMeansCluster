@@ -6,6 +6,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /** 
  * You can modify this class as you see fit, as long as you correctly update the
@@ -13,14 +14,22 @@ import java.io.IOException;
  */
 public class ClusterToPointReducer extends Reducer<Text, Text, Text, Text>
 {
-	//update globla centroids
+	
 	public void reduce(Point key, Iterable<Point> values, Context context){
 		
+		int numOfPoints = 0;
+		Point sum = new Point(key.dimension);
 		
 		for(Point p: values){
-			
+			sum = Point.addPoints(sum, p);
+			numOfPoints++;
 		}
 		
+		Point newCentroid = Point.multiplyScalar(sum, 1/numOfPoints);
+		
+		int index = KMeans.centroids.indexOf(key);
+		
+		KMeans.centroids.set(index, newCentroid);
 		
 	}
 }
