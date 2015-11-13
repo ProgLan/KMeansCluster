@@ -20,6 +20,10 @@ import java.util.ArrayList;
 
 public class UpdateJobRunner
 {
+	
+	static int numOfIter = 0;
+	static float epsilon = (float) 0.00001;
+	
     /**
      * Create a map-reduce job to update the current centroids.
      * @param jobId Some arbitrary number so that Hadoop can create a directory "<outputDirectory>/<jobname>_<jobId>"
@@ -30,26 +34,31 @@ public class UpdateJobRunner
      * @param The output directory for which to write job results, specified by user.
      * @precondition The global centroids variable has been set.
      */
-//    public static Job createUpdateJob(int jobId, String inputDirectory, String outputDirectory)
-//        throws IOException
-//    {
-////    	Job init_job = new Job(new Configuration(), "kmeans_init");
-////        init_job.setJarByClass(KMeans.class);
-////        init_job.setMapperClass(FileMapper.class);
-////        init_job.setMapOutputKeyClass(IntWritable.class);
-////        init_job.setMapOutputValueClass(Point.class);
-////        init_job.setReducerClass(FileReducer.class);
-////        init_job.setOutputKeyClass(IntWritable.class);
-////        init_job.setOutputValueClass(Point.class);
-////        FileInputFormat.addInputPath(init_job, new Path(inputDirectory));
-////        FileOutputFormat.setOutputPath(init_job, new Path(outputDirectory));
-////        init_job.setInputFormatClass(KeyValueTextInputFormat.class);
-////        return init_job;
-////    	
-////    	System.out.println("TODO");
-////        System.exit(1);
-////        return null;
-//    }
+    public static Job createUpdateJob(int jobId, String inputDirectory, String outputDirectory)
+        throws IOException
+    {
+    	//TODO: what hack is the deprecation?
+    	@SuppressWarnings("deprecation")
+		Job init_job = new Job(new Configuration(), "kmeans_init");
+        init_job.setJarByClass(KMeans.class);
+        init_job.setMapperClass(PointToClusterMapper.class);
+        init_job.setMapOutputKeyClass(Point.class);
+        init_job.setMapOutputValueClass(Point.class);
+        
+        init_job.setReducerClass(ClusterToPointReducer.class);
+        init_job.setOutputKeyClass(Point.class);
+        init_job.setOutputValueClass(Point.class);
+        
+        FileInputFormat.addInputPath(init_job, new Path(inputDirectory));
+        FileOutputFormat.setOutputPath(init_job, new Path(outputDirectory));
+        init_job.setInputFormatClass(KeyValueTextInputFormat.class);
+        
+        return init_job;
+//    	
+//    	System.out.println("TODO");
+//        System.exit(1);
+//        return null;
+    }
 
     /**
      * Run the jobs until the centroids stop changing.
@@ -69,8 +78,44 @@ public class UpdateJobRunner
     public static int runUpdateJobs(int maxIterations, String inputDirectory,
         String outputDirectory)
     {
-        System.out.println("TODO");
-        System.exit(1);
-        return 0;
+    	if(numOfIter > maxIterations){
+    		System.out.println("Iterate more than max Iteration times");
+    		return maxIterations;
+    	}else{
+    		numOfIter++;
+    		
+    		//TODO: read C_old from inputDirectory
+    		
+    		ArrayList<Point> oldCentroid = new ArrayList<Point>();
+    		
+    		//compare with KMeans.centroids C_new
+    		if(oldCentroid.size() != KMeans.centroids.size()){
+    			System.out.println("old and new centroids size is inconsistent, what hack?");
+    			return numOfIter;
+    		}else{
+    			for(int i = 0; i < KMeans.centroids.size(); i++){
+    				float centroidDis = Point.distance(oldCentroid.get(i), KMeans.centroids.get(i));
+    				
+    				//if there is one centroid dis > epsilon, then consider
+    				//C_old and C_new is different
+    				if(centroidDis > epsilon){
+    					//TODO: output the C_new to output directory
+    					//and return
+    					
+    					System.out.println("Have not converged, go another round!");
+    					return numOfIter;
+    				}
+    			}
+    			
+    			//TODO:C_old and C_new is same, then converge, stop runUpdateJobs
+    			System.out.println("Converged, oh yeah, numOfIter is : " + numOfIter);
+    			return numOfIter;
+    			
+    		}
+    	}
+    	
+        //System.out.println("TODO");
+        //System.exit(1);
+        
     }
 }
