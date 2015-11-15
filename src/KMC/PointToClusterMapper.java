@@ -14,44 +14,32 @@ import java.util.StringTokenizer;
  * You can modify this class as you see fit.  You may assume that the global
  * centroids have been correctly initialized.
  */
-public class PointToClusterMapper extends Mapper<LongWritable, Text, Point, Point>
+public class PointToClusterMapper extends Mapper<Text, Text, IntWritable, Point>
 {
 	
 	
-	public void map(LongWritable key, Text value, Context context)
+	public void map(Text key, Text value, Context context)
             throws IOException, InterruptedException
         {
-			ArrayList<Point> centroids = KMeans.centroids;
-		
-			String inputString = value.toString();
-			String[] tokens = inputString.split("\\s+");
+			float minDis = Float.MAX_VALUE;
+			Point closest = null;
+			Point p = new Point(key.toString());
+			int closestIndex = 0;
 			
-			if(centroids == null || centroids.size() == 0){
-				System.out.println("centroids is null or empty, cannot figure out the point's dimension");
-			}else{
-				int dim = centroids.get(0).dimension;
+			for(int i = 0; i < KMeans.centroids.size(); i++){
+				Point c = new Point(KMeans.centroids.get(i));
 				
-				for(int i = 0; i < tokens.length; i+=dim){
-					Point p = new Point(dim);
-					float minDis = Float.MAX_VALUE;
-					Point closestCentroid = new Point(dim);
-					
-					//construct a point from input token
-					for(int j = i; j < dim + i; j++){
-						p.pointCoord.set(j, Float.parseFloat(tokens[j]));
-					}
-					
-					//find the closet centroid
-					for(int k = 0; k < centroids.size(); k++){
-						if(Point.distance(p, centroids.get(k)) < minDis){
-							closestCentroid = centroids.get(k);
-							minDis = Point.distance(p, centroids.get(k));
-						}
-					}
-					
-					context.write(closestCentroid, p);
+				float dis = Point.distance(p, c);
+				
+				if(dis < minDis){
+					closest = c;
+					minDis = dis;
+					closestIndex = i;
 				}
 			}
+			
+			context.write(new IntWritable(closestIndex), p);
+			
         }
 
 }

@@ -17,7 +17,7 @@ import org.apache.hadoop.io.*; // Writable
  */
 
 
-public class Point implements WritableComparable{
+public class Point implements WritableComparable<Point>{
     /**
      * Construct a Point with the given dimensions [dim]. The coordinates should all be 0.
      * For example:
@@ -28,11 +28,14 @@ public class Point implements WritableComparable{
 	//key is in which dimension, value is the point's value in that dimension
 	//Point(x_0:1.0, x_1:2.0, x_2:3.0) could be expressed as <0,1.0>,<1,2.0>,<2,3.0>
 	ArrayList<Float> pointCoord = new ArrayList<Float>();
-	
+	static float epsilon = 0.000001f;
 	
 	
 	public Point(){
-		
+		this.dimension = KMeans.dimension;
+		for(int i = 0; i < this.dimension; i++){
+			this.pointCoord.add(0.0f);
+		}
 	}
 	
     public Point(int dim)
@@ -47,8 +50,6 @@ public class Point implements WritableComparable{
     		}
     		
     	}
-        //System.out.println("TODO");
-        //System.exit(1);
     }
 
     /**
@@ -139,28 +140,7 @@ public class Point implements WritableComparable{
      * You should order the points "lexicographically" in the order of the coordinates.
      * Comparing two points of different dimensions results in undefined behavior.
      */
-    @Override
-    public int compareTo(Object o)
-    {   
-    	Point p = (Point)o;
-    	if(this.dimension != p.dimension){
-    		System.out.println("two points have different dimensions, undefined behavior");
-    		return 0;
-    	}else{
-    		for(int i = 0; i < this.dimension; i++){
-    			if(this.pointCoord.get(i) == p.pointCoord.get(i)){
-    				continue;
-    			}else{
-    				return this.pointCoord.get(i) < p.pointCoord.get(i) ? -1:1;
-    			}
-    		}
-    		
-    		return 0;
-    	}
-        //System.out.println("TODO");
-        //System.exit(1);
-        //return 0;
-    }
+   
 
     /**
      * @return The L2 distance between two points.
@@ -201,7 +181,7 @@ public class Point implements WritableComparable{
         	Point res = new Point(x.dimension);
         	
         	for(int i = 0; i < x.dimension; i++){
-        		res.pointCoord.set(i, x.pointCoord.get(i) + y.pointCoord.get(i));
+        		res.pointCoord.set(i, x.pointCoord.get(i).floatValue() + y.pointCoord.get(i).floatValue());
         	}
         	
         	return res;
@@ -223,7 +203,7 @@ public class Point implements WritableComparable{
     	Point res = new Point(dim);
     	
     	for(int i = 0; i < dim; i++){
-    		res.pointCoord.set(i, x.pointCoord.get(i) * c);
+    		res.pointCoord.set(i, new Float(x.pointCoord.get(i).floatValue()) * c);
     	}
     	
     	return res;
@@ -237,57 +217,69 @@ public class Point implements WritableComparable{
 	public void readFields(DataInput arg0) throws IOException {
 		// TODO Auto-generated method stub
 		
-		System.out.println("readField");
-		
-		this.dimension = KMeans.centroids.get(0).dimension;
-		
-		System.out.println("dimension" + this.dimension);
+//		System.out.println("readField");
+//		
+//		this.dimension = KMeans.centroids.get(0).dimension;
+//		
+//		System.out.println("dimension" + this.dimension);
+//		
+		this.dimension = arg0.readInt();
 		
 		for(int i = 0; i < this.dimension; i++){
-			float data = arg0.readFloat();
-			this.pointCoord.add(data);
+			this.pointCoord.set(i, arg0.readFloat());
 		}
-		
-		for(int j = 0; j < this.pointCoord.size();j++){
-			System.out.println("PC" + this.pointCoord.get(j));
-		}
-	
-		System.out.println("point size" + this.pointCoord.size());
-		
-//		if(inputString == null || inputString.length() == 0){
-//    		System.out.println("input string is empty");
-//    	}else{
-//    		String[] tempStore = inputString.split("\\s+");
-//    		this.dimension = tempStore.length;
-//    		
-//    		for(int i = 0; i < this.dimension; i++){
-//    			this.pointCoord.put(i, Float.parseFloat(tempStore[i]));
-//    		}
-//    	}
+
 	}
 	
 	//serialize the field of output arg0
 	@Override
 	public void write(DataOutput arg0) throws IOException {
-		// TODO Auto-generated method stub
-//		for(int i = 0; i < this.dimension; i++){
-//			if(i == this.dimension - 1){
-//				arg0.writeFloat(this.pointCoord.get(i));
-//				arg0.writeChars("\n");
-//			}else{
-//				arg0.writeFloat(this.pointCoord.get(i));
-//				//TODO: why cannot use \s
-//				arg0.writeChars("\t");
-//			}
-//		}
 		
-		System.out.println("write");
+		arg0.writeInt(this.dimension);
 		
 		
 		for(int i = 0; i < this.dimension; i++){
 			arg0.writeFloat(this.pointCoord.get(i));
 		}
 	}
+	
+	public int hashCode(){
+		final int prime = 17;
+		int result = 1;
+		result = prime * result + this.dimension;
 
+		if(this.dimension>0){
+			for(int i = 0; i <this.dimension; i++){}
+		}
+		return result;
+	}
+
+	
+	
+	@Override
+	public int compareTo(Point o) {
+
+    	if(this.dimension != o.dimension){
+    		System.out.println("two points have different dimensions, undefined behavior");
+    		return 0;
+    	}else{
+    		for(int i = 0; i < this.dimension; i++){
+    			if(this.pointCoord.get(i) - o.pointCoord.get(i) < epsilon){
+    				continue;
+    			}else{
+    				return this.pointCoord.get(i) < o.pointCoord.get(i) ? -1:1;
+    			}
+    		}
+    		
+    		return 0;
+    	}
+		
+		
+	}
+
+
+
+	
+	
 
 }

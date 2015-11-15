@@ -21,9 +21,9 @@ import java.util.ArrayList;
 public class UpdateJobRunner
 {
 	
-	static int numOfIter = 0;
-	static float epsilon = (float) 0.00001;
-	static int jobId = 0;
+	
+	
+	static ArrayList<Point> oldCentroids = new ArrayList<Point>();
 	
     /**
      * Create a map-reduce job to update the current centroids.
@@ -40,21 +40,18 @@ public class UpdateJobRunner
     {
     	//TODO: what hack is the deprecation?
     	@SuppressWarnings("deprecation")
-		Job init_job = new Job(new Configuration(), "kmeans_init");
-        init_job.setJarByClass(KMeans.class);
-        init_job.setMapperClass(PointToClusterMapper.class);
-        init_job.setMapOutputKeyClass(Point.class);
-        init_job.setMapOutputValueClass(Point.class);
-        
-        init_job.setReducerClass(ClusterToPointReducer.class);
-        init_job.setOutputKeyClass(Point.class);
-        init_job.setOutputValueClass(Point.class);
-        
-        FileInputFormat.addInputPath(init_job, new Path(inputDirectory));
-        FileOutputFormat.setOutputPath(init_job, new Path(outputDirectory));
-        init_job.setInputFormatClass(KeyValueTextInputFormat.class);
-        
-        return init_job;
+    	Job updateJob = new Job(new Configuration(), Integer.toString(jobId));
+    	updateJob.setJarByClass(KMeans.class);
+    	updateJob.setMapperClass(PointToClusterMapper.class);
+    	updateJob.setMapOutputKeyClass(IntWritable.class);
+    	updateJob.setMapOutputValueClass(Point.class);
+    	updateJob.setReducerClass(ClusterToPointReducer.class);
+    	updateJob.setOutputKeyClass(IntWritable.class);
+    	updateJob.setOutputValueClass(Point.class);
+        FileInputFormat.addInputPath(updateJob, new Path(inputDirectory));
+        FileOutputFormat.setOutputPath(updateJob, new Path(outputDirectory + "/" + Integer.toString(jobId)));
+        updateJob.setInputFormatClass(KeyValueTextInputFormat.class);
+        return updateJob;
 //    	
 //    	System.out.println("TODO");
 //        System.exit(1);
@@ -80,51 +77,47 @@ public class UpdateJobRunner
     public static int runUpdateJobs(int maxIterations, String inputDirectory,
         String outputDirectory) throws IOException
     {
-    	if(numOfIter > maxIterations){
-    		System.out.println("Iterate more than max Iteration times");
-    		return maxIterations;
-    	}else{
+    	boolean isChanged = true;
+    	Job[] thisJob = new Job[maxIterations];
+    	int numOfIter = 0;
+    	
+    	for(int i = 0; i < KMeans.centroids.size();i++){
+			oldCentroids.add(new Point(KMeans.centroids.get(i)));
+		}
+    	
+    	while(numOfIter <= maxIterations && isChanged){
+    		for(int i = 0; i < KMeans.centroids.size(); i++){
+    			oldCentroids.set(i, KMeans.centroids.get(i));
+    		}
+    		
+    		thisJob[numOfIter] = createUpdateJob(numOfIter, inputDirectory, outputDirectory);
+    		try {
+				thisJob[numOfIter].waitForCompletion(true);
+			
+    		} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		isChanged = checkChanged();
     		numOfIter++;
     		
-    		ArrayList<Point> oldCentroid = KMeans.centroids;
-    		
-    		for(int i = 0; i <)
-    		
-    		createUpdateJob(jobId++, inputDirectory, outputDirectory);
-    		System.out.println("jobId : " + jobId);
-    		
-    		//TODO: read C_old from inputDirectory
-    		ArrayList<Point> newCentroid = KMeans.centroids;
-    		
-    		//compare with KMeans.centroids C_new
-    		if(oldCentroid.size() != newCentroid.size()){
-    			System.out.println("old and new centroids size is inconsistent, what hack?");
-    			return numOfIter;
-    		}else{
-    			for(int i = 0; i < KMeans.centroids.size(); i++){
-    				float centroidDis = Point.distance(oldCentroid.get(i), newCentroid.get(i));
-    				
-    				//if there is one centroid dis > epsilon, then consider
-    				//C_old and C_new is different
-    				if(centroidDis > epsilon){
-    					//TODO: output the C_new to output directory
-    					//and return
-    					runUpdateJobs(10, outputDirectory, inputDirectory);
-    					
-    					//System.out.println("Have not converged, go another round!");
-    					return numOfIter;
-    				}
-    			}
-    			
-    			//TODO:C_old and C_new is same, then converge, stop runUpdateJobs
-    			System.out.println("Converged, oh yeah, numOfIter is : " + numOfIter);
-    			return numOfIter;
-    			
-    		}
     	}
     	
-        //System.out.println("TODO");
-        //System.exit(1);
+    	return numOfIter;
         
     }
+    
+    public static boolean checkChanged(){
+    	for(int i = 0; i < KMeans.centroids.size(); i++){
+			if(oldCentroids.get(i).compareTo(KMeans.centroids.get(i)) != 0){
+				return true;
+			}
+		}
+    	
+    	return false;
+	}
 }

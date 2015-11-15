@@ -186,9 +186,9 @@ public class KMeans {
     public static void main(String[] args) throws Exception {
     	
     	//TODO:
-    	org.apache.log4j.BasicConfigurator.configure();
+    	//org.apache.log4j.BasicConfigurator.configure();
     	
-    	System.setProperty("hadoop.home.dir","/");
+    	//System.setProperty("hadoop.home.dir","/");
     	
     	Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();

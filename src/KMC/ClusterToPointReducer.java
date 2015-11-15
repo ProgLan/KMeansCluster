@@ -12,28 +12,30 @@ import java.util.ArrayList;
  * You can modify this class as you see fit, as long as you correctly update the
  * global centroids.
  */
-public class ClusterToPointReducer extends Reducer<Text, Text, Text, Text>
+public class ClusterToPointReducer extends Reducer<IntWritable, Point, IntWritable, Point>
 {
 	
-	public ClusterToPointReducer(){
-		
-	}
 	
-	public void reduce(Point key, Iterable<Point> values, Context context){
+	
+	public void reduce(IntWritable key, Iterable<Point> values, Context context) throws IOException, InterruptedException{
 		
-		int numOfPoints = 0;
-		Point sum = new Point(key.dimension);
+		float numOfPoints = 0.0f;
+		Point sum = new Point(KMeans.centroids.get(0).getDimension());
 		
 		for(Point p: values){
 			sum = Point.addPoints(sum, p);
 			numOfPoints++;
 		}
 		
-		Point newCentroid = Point.multiplyScalar(sum, 1/numOfPoints);
+		//System.out.println("numOfPoit" + numOfPoints);
 		
-		int index = KMeans.centroids.indexOf(key);
+		Point newCentroid = Point.multiplyScalar(sum, 1.0f/numOfPoints);
 		
-		KMeans.centroids.set(index, newCentroid);
+		//int index = KMeans.centroids.indexOf(key);
+		System.out.println("key" + key.get());
+		KMeans.centroids.set(key.get(), newCentroid);
+		
+		context.write(key, newCentroid);
 		
 	}
 }
