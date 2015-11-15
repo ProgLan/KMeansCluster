@@ -67,4 +67,19 @@ public class HelperTests
         assertEquals("0.0 0.0 0.0", Point.multiplyScalar(p1, 3).toString());
         assertEquals("2.5 5.0 5.0", Point.multiplyScalar(p2, (float)2.5).toString());
     }
+    
+    @Test
+    public void point_compareTo_test1(){
+    	Point p1 = new Point("0 1 2");
+    	Point p2 = new Point("1 1 1");
+    	
+    	assertEquals(-1, p1.compareTo(p2));
+    }
+    
+    @Test
+    public void point_toString_test1(){
+    	Point p1 = new Point("1 2 3");
+    	
+    	assertEquals("1.0 2.0 3.0", p1.toString());
+    }
 } 

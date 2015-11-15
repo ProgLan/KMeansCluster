@@ -188,8 +188,12 @@ public class KMeans {
     	//TODO:
     	org.apache.log4j.BasicConfigurator.configure();
     	
+    	System.setProperty("hadoop.home.dir","/");
+    	
     	Configuration conf = new Configuration();
         String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
+        System.out.println("otherArgs's length: " + otherArgs.length);
+        
         boolean centroidsFromFile = false;
         // Note that command line arguments are not sanitized
         if (otherArgs.length == 4 || otherArgs.length == 5)

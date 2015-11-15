@@ -5,7 +5,9 @@ JAVAC=javac
 # Thus, if your Hadoop directory structure looks like "/opt/hadoop-2.7.1/bin/...", then set HADOOP_PREFIX
 # to "/opt/"
 HADOOP_PREFIX=/usr/local/Cellar/hadoop/2.7.1/libexec
-CLASS_PATH=$(HADOOP_PREFIX)/share/hadoop/common/*:$(HADOOP_PREFIX)/share/hadoop/yarn/lib/*:$(HADOOP_PREFIX)/share/hadoop/mapreduce/lib/*:$(HADOOP_PREFIX)/share/hadoop/mapreduce/*:./#Xlint:deprecation
+CLASS_PATH=$(HADOOP_PREFIX)/share/hadoop/common/*:$(HADOOP_PREFIX)/share/hadoop/yarn/lib/*:$(HADOOP_PREFIX)/share/hadoop/mapreduce/lib/*:$(HADOOP_PREFIX)/share/hadoop/mapreduce/*:./
+JFLAGS = -classpath $(CLASS_PATH)
+#Xlint:deprecation
 # Point this to your JUnit 4 path
 JUNIT4_PATH=/usr/share/java/junit4.jar
 

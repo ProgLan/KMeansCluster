@@ -23,6 +23,7 @@ public class UpdateJobRunner
 	
 	static int numOfIter = 0;
 	static float epsilon = (float) 0.00001;
+	static int jobId = 0;
 	
     /**
      * Create a map-reduce job to update the current centroids.
@@ -74,9 +75,10 @@ public class UpdateJobRunner
      * @param inputDirectory  The path to the directory from which to read the files of Points
      * @param outputDirectory The path to the directory to which to put Hadoop output files
      * @return The number of iterations that were executed.
+     * @throws IOException 
      */
     public static int runUpdateJobs(int maxIterations, String inputDirectory,
-        String outputDirectory)
+        String outputDirectory) throws IOException
     {
     	if(numOfIter > maxIterations){
     		System.out.println("Iterate more than max Iteration times");
@@ -84,25 +86,32 @@ public class UpdateJobRunner
     	}else{
     		numOfIter++;
     		
-    		//TODO: read C_old from inputDirectory
+    		ArrayList<Point> oldCentroid = KMeans.centroids;
     		
-    		ArrayList<Point> oldCentroid = new ArrayList<Point>();
+    		for(int i = 0; i <)
+    		
+    		createUpdateJob(jobId++, inputDirectory, outputDirectory);
+    		System.out.println("jobId : " + jobId);
+    		
+    		//TODO: read C_old from inputDirectory
+    		ArrayList<Point> newCentroid = KMeans.centroids;
     		
     		//compare with KMeans.centroids C_new
-    		if(oldCentroid.size() != KMeans.centroids.size()){
+    		if(oldCentroid.size() != newCentroid.size()){
     			System.out.println("old and new centroids size is inconsistent, what hack?");
     			return numOfIter;
     		}else{
     			for(int i = 0; i < KMeans.centroids.size(); i++){
-    				float centroidDis = Point.distance(oldCentroid.get(i), KMeans.centroids.get(i));
+    				float centroidDis = Point.distance(oldCentroid.get(i), newCentroid.get(i));
     				
     				//if there is one centroid dis > epsilon, then consider
     				//C_old and C_new is different
     				if(centroidDis > epsilon){
     					//TODO: output the C_new to output directory
     					//and return
+    					runUpdateJobs(10, outputDirectory, inputDirectory);
     					
-    					System.out.println("Have not converged, go another round!");
+    					//System.out.println("Have not converged, go another round!");
     					return numOfIter;
     				}
     			}

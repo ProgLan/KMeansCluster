@@ -38,7 +38,7 @@ public class PointToClusterMapper extends Mapper<LongWritable, Text, Point, Poin
 					
 					//construct a point from input token
 					for(int j = i; j < dim + i; j++){
-						p.pointCoord.put(j, Float.parseFloat(tokens[j]));
+						p.pointCoord.set(j, Float.parseFloat(tokens[j]));
 					}
 					
 					//find the closet centroid

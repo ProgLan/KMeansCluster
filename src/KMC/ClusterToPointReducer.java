@@ -15,6 +15,10 @@ import java.util.ArrayList;
 public class ClusterToPointReducer extends Reducer<Text, Text, Text, Text>
 {
 	
+	public ClusterToPointReducer(){
+		
+	}
+	
 	public void reduce(Point key, Iterable<Point> values, Context context){
 		
 		int numOfPoints = 0;

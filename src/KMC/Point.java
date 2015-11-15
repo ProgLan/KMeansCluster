@@ -15,6 +15,8 @@ import org.apache.hadoop.io.*; // Writable
  * NOTE: This implementation is NOT complete.  As mentioned above, you need
  * to implement WritableComparable at minimum.  Modify this class as you see fit.
  */
+
+
 public class Point implements WritableComparable{
     /**
      * Construct a Point with the given dimensions [dim]. The coordinates should all be 0.
@@ -25,8 +27,13 @@ public class Point implements WritableComparable{
 	int dimension;
 	//key is in which dimension, value is the point's value in that dimension
 	//Point(x_0:1.0, x_1:2.0, x_2:3.0) could be expressed as <0,1.0>,<1,2.0>,<2,3.0>
-	HashMap<Integer, Float> pointCoord = new HashMap<Integer, Float>();
+	ArrayList<Float> pointCoord = new ArrayList<Float>();
 	
+	
+	
+	public Point(){
+		
+	}
 	
     public Point(int dim)
     {
@@ -36,7 +43,7 @@ public class Point implements WritableComparable{
     	}else{
     		this.dimension = dim;
     		for(int i = 0; i < dim; i++){
-    			this.pointCoord.put(i, (float) 0.0);
+    			this.pointCoord.add(0.0f);
     		}
     		
     	}
@@ -60,7 +67,7 @@ public class Point implements WritableComparable{
     		this.dimension = tempStore.length;
     		
     		for(int i = 0; i < this.dimension; i++){
-    			this.pointCoord.put(i, Float.parseFloat(tempStore[i]));
+    			this.pointCoord.add(Float.parseFloat(tempStore[i]));
     		}
     	}
         
@@ -76,7 +83,7 @@ public class Point implements WritableComparable{
     	this.dimension = other.dimension;
     	
     	for(int i = 0; i < this.dimension; i++){
-    		this.pointCoord.put(i, other.pointCoord.get(i));
+    		this.pointCoord.add(other.pointCoord.get(i));
     	}
         //System.out.println("TODO");
         //System.exit(1);
@@ -103,7 +110,7 @@ public class Point implements WritableComparable{
      */
     public String toString()
     {
-    	if(this.pointCoord == null || this.pointCoord.keySet().size() == 0 || this.dimension == 0){
+    	if(this.pointCoord == null || this.pointCoord.size() == 0 || this.dimension == 0){
     		System.out.println("point is empty");
     		return null;
     	}else{
@@ -194,7 +201,7 @@ public class Point implements WritableComparable{
         	Point res = new Point(x.dimension);
         	
         	for(int i = 0; i < x.dimension; i++){
-        		res.pointCoord.put(i, x.pointCoord.get(i) + y.pointCoord.get(i));
+        		res.pointCoord.set(i, x.pointCoord.get(i) + y.pointCoord.get(i));
         	}
         	
         	return res;
@@ -216,7 +223,7 @@ public class Point implements WritableComparable{
     	Point res = new Point(dim);
     	
     	for(int i = 0; i < dim; i++){
-    		res.pointCoord.put(i, x.pointCoord.get(i) * c);
+    		res.pointCoord.set(i, x.pointCoord.get(i) * c);
     	}
     	
     	return res;
@@ -229,35 +236,57 @@ public class Point implements WritableComparable{
 	@Override
 	public void readFields(DataInput arg0) throws IOException {
 		// TODO Auto-generated method stub
-		String inputString = arg0.readLine();
 		
-		if(inputString == null || inputString.length() == 0){
-    		System.out.println("input string is empty");
-    	}else{
-    		String[] tempStore = inputString.split("\\s+");
-    		this.dimension = tempStore.length;
-    		
-    		for(int i = 0; i < this.dimension; i++){
-    			this.pointCoord.put(i, Float.parseFloat(tempStore[i]));
-    		}
-    	}
+		System.out.println("readField");
+		
+		this.dimension = KMeans.centroids.get(0).dimension;
+		
+		System.out.println("dimension" + this.dimension);
+		
+		for(int i = 0; i < this.dimension; i++){
+			float data = arg0.readFloat();
+			this.pointCoord.add(data);
+		}
+		
+		for(int j = 0; j < this.pointCoord.size();j++){
+			System.out.println("PC" + this.pointCoord.get(j));
+		}
+	
+		System.out.println("point size" + this.pointCoord.size());
+		
+//		if(inputString == null || inputString.length() == 0){
+//    		System.out.println("input string is empty");
+//    	}else{
+//    		String[] tempStore = inputString.split("\\s+");
+//    		this.dimension = tempStore.length;
+//    		
+//    		for(int i = 0; i < this.dimension; i++){
+//    			this.pointCoord.put(i, Float.parseFloat(tempStore[i]));
+//    		}
+//    	}
 	}
 	
 	//serialize the field of output arg0
 	@Override
 	public void write(DataOutput arg0) throws IOException {
 		// TODO Auto-generated method stub
-		for(int i = 0; i < this.dimension; i++){
-			if(i == this.dimension - 1){
-				arg0.writeFloat(this.pointCoord.get(i));
-				arg0.writeChars("\n");
-			}else{
-				arg0.writeFloat(this.pointCoord.get(i));
-				//TODO: why cannot use \s
-				arg0.writeChars("\t");
-			}
-		}
+//		for(int i = 0; i < this.dimension; i++){
+//			if(i == this.dimension - 1){
+//				arg0.writeFloat(this.pointCoord.get(i));
+//				arg0.writeChars("\n");
+//			}else{
+//				arg0.writeFloat(this.pointCoord.get(i));
+//				//TODO: why cannot use \s
+//				arg0.writeChars("\t");
+//			}
+//		}
 		
+		System.out.println("write");
+		
+		
+		for(int i = 0; i < this.dimension; i++){
+			arg0.writeFloat(this.pointCoord.get(i));
+		}
 	}
 
 
